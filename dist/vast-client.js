@@ -2414,17 +2414,6 @@
     return onceWrapper;
   }
 
-  // This mock module is loaded in stead of the original NodeURLHandler module
-  // when bundling the library for environments which are not node.
-  // This allows us to avoid bundling useless node components and have a smaller build.
-  function get$2(url, options, cb) {
-    cb(new Error('Please bundle the library for node to use the node urlHandler'));
-  }
-
-  var nodeURLHandler = {
-    get: get$2
-  };
-
   var DEFAULT_TIMEOUT = 120000;
 
   function xhr() {
@@ -2515,13 +2504,7 @@
       options = {};
     }
 
-    if (typeof window === 'undefined' || window === null) {
-      return nodeURLHandler.get(url, options, cb);
-    } else if (XHRURLHandler.supported()) {
-      return XHRURLHandler.get(url, options, cb);
-    }
-
-    return cb(new Error('Current context is not supported by any of the default URLHandlers. Please provide a custom URLHandler'));
+    return XHRURLHandler.get(url, options, cb);
   }
 
   var urlHandler = {
@@ -4407,6 +4390,7 @@
   exports.VASTClient = VASTClient;
   exports.VASTParser = VASTParser;
   exports.VASTTracker = VASTTracker;
+  exports.urlHandler = XHRURLHandler;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

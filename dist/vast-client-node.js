@@ -2424,7 +2424,7 @@ var https = require('https');
 
 var DOMParser = require('@xmldom/xmldom').DOMParser;
 
-function get$2(url, options, cb) {
+function get$1(url, options, cb) {
   url = uri.parse(url);
   var httpModule = url.protocol === 'https:' ? https : http;
 
@@ -2482,85 +2482,7 @@ function get$2(url, options, cb) {
 }
 
 var nodeURLHandler = {
-  get: get$2
-};
-
-function xhr() {
-  try {
-    var request = new window.XMLHttpRequest();
-
-    if ('withCredentials' in request) {
-      // check CORS support
-      return request;
-    }
-
-    return null;
-  } catch (err) {
-    return null;
-  }
-}
-
-function supported() {
-  return !!xhr();
-}
-
-function handleLoad(request, cb) {
-  if (request.status === 200) {
-    cb(null, request.responseXML, {
-      byteLength: request.response.length,
-      statusCode: request.status
-    });
-  } else {
-    handleFail(request, cb, false);
-  }
-}
-
-function handleFail(request, cb, isTimeout) {
-  var statusCode = !isTimeout ? request.status : 408; // Request timeout
-
-  var msg = isTimeout ? "XHRURLHandler: Request timed out after ".concat(request.timeout, " ms (").concat(statusCode, ")") : "XHRURLHandler: ".concat(request.statusText, " (").concat(statusCode, ")");
-  cb(new Error(msg), null, {
-    statusCode: statusCode
-  });
-}
-
-function get$1(url, options, cb) {
-  if (window.location.protocol === 'https:' && url.indexOf('http://') === 0) {
-    return cb(new Error('XHRURLHandler: Cannot go from HTTPS to HTTP.'));
-  }
-
-  try {
-    var request = xhr();
-    request.open('GET', url);
-    request.timeout = options.timeout || DEFAULT_TIMEOUT;
-    request.withCredentials = options.withCredentials || false;
-    request.overrideMimeType && request.overrideMimeType('text/xml');
-
-    request.onload = function () {
-      return handleLoad(request, cb);
-    };
-
-    request.onerror = function () {
-      return handleFail(request, cb, false);
-    };
-
-    request.onabort = function () {
-      return handleFail(request, cb, false);
-    };
-
-    request.ontimeout = function () {
-      return handleFail(request, cb, true);
-    };
-
-    request.send();
-  } catch (error) {
-    cb(new Error('XHRURLHandler: Unexpected error'));
-  }
-}
-
-var XHRURLHandler = {
-  get: get$1,
-  supported: supported
+  get: get$1
 };
 
 function get(url, options, cb) {
@@ -2573,13 +2495,7 @@ function get(url, options, cb) {
     options = {};
   }
 
-  if (typeof window === 'undefined' || window === null) {
-    return nodeURLHandler.get(url, options, cb);
-  } else if (XHRURLHandler.supported()) {
-    return XHRURLHandler.get(url, options, cb);
-  }
-
-  return cb(new Error('Current context is not supported by any of the default URLHandlers. Please provide a custom URLHandler'));
+  return nodeURLHandler.get(url, options, cb);
 }
 
 var urlHandler = {
@@ -4465,3 +4381,4 @@ var VASTTracker = /*#__PURE__*/function (_EventEmitter) {
 exports.VASTClient = VASTClient;
 exports.VASTParser = VASTParser;
 exports.VASTTracker = VASTTracker;
+exports.urlHandler = nodeURLHandler;
