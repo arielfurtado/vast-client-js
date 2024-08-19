@@ -65,3 +65,5 @@ export const XHRURLHandler = {
   get,
   supported,
 };
+
+export default XHRURLHandler;

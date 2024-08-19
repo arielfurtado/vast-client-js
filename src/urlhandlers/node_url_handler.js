@@ -64,3 +64,6 @@ function get(url, options, cb) {
 export const nodeURLHandler = {
   get,
 };
+
+
+export default nodeURLHandler;

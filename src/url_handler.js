@@ -1,5 +1,4 @@
-import { nodeURLHandler } from './urlhandlers/mock_node_url_handler';
-import { XHRURLHandler } from './urlhandlers/xhr_url_handler';
+import handler from '_URLHandler_';
 
 function get(url, options, cb) {
   // Allow skip of the options param
@@ -10,16 +9,7 @@ function get(url, options, cb) {
     options = {};
   }
 
-  if (typeof window === 'undefined' || window === null) {
-    return nodeURLHandler.get(url, options, cb);
-  } else if (XHRURLHandler.supported()) {
-    return XHRURLHandler.get(url, options, cb);
-  }
-  return cb(
-    new Error(
-      'Current context is not supported by any of the default URLHandlers. Please provide a custom URLHandler'
-    )
-  );
+  return handler.get(url, options, cb);
 }
 
 export const urlHandler = {

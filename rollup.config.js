@@ -39,7 +39,17 @@ const browserConfig = {
     format: 'umd',
     file: 'dist/vast-client.js',
   },
-  plugins: [babelPlugin],
+  plugins: [
+    alias({
+      entries: [
+        {
+          find: '_URLHandler_',
+          replacement: './urlhandlers/xhr_url_handler.js',
+        },
+      ],
+    }), 
+    babelPlugin
+  ],
 };
 
 const browserScriptConfig = {
@@ -49,7 +59,17 @@ const browserScriptConfig = {
     format: 'iife',
     file: 'dist/vast-client-browser.js',
   },
-  plugins: [babelPlugin],
+  plugins: [
+    alias({
+      entries: [
+        {
+          find: '_URLHandler_',
+          replacement: './urlhandlers/xhr_url_handler.js',
+        },
+      ],
+    }), 
+    babelPlugin
+  ],
 };
 
 const nodeConfig = {
@@ -62,8 +82,8 @@ const nodeConfig = {
     alias({
       entries: [
         {
-          find: './urlhandlers/mock_node_url_handler',
-          replacement: './urlhandlers/node_url_handler',
+          find: '_URLHandler_',
+          replacement: './urlhandlers/node_url_handler.js',
         },
       ],
     }),
