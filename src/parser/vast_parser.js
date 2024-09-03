@@ -3,6 +3,7 @@ import { EventEmitter } from '../util/event_emitter';
 import { parserUtils } from './parser_utils';
 import { urlHandler } from '../url_handler';
 import { util } from '../util/util';
+import track from '../util/track_browser';
 import { createVASTResponse } from '../vast_response';
 import { DEFAULT_TIMEOUT } from '../urlhandlers/consts';
 import { updateEstimatedBitrate, estimatedBitrate } from './bitrate';
@@ -85,7 +86,7 @@ export class VASTParser extends EventEmitter {
       'VAST-error',
       Object.assign({}, DEFAULT_EVENT_DATA, errorCode, ...data)
     );
-    util.track(urlTemplates, errorCode);
+    track(urlTemplates, errorCode);
   }
 
   /**

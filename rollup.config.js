@@ -47,8 +47,8 @@ const browserConfig = {
           replacement: './urlhandlers/xhr_url_handler.js',
         },
       ],
-    }), 
-    babelPlugin
+    }),
+    babelPlugin,
   ],
 };
 
@@ -67,8 +67,8 @@ const browserScriptConfig = {
           replacement: './urlhandlers/xhr_url_handler.js',
         },
       ],
-    }), 
-    babelPlugin
+    }),
+    babelPlugin,
   ],
 };
 
@@ -84,6 +84,10 @@ const nodeConfig = {
         {
           find: '_URLHandler_',
           replacement: './urlhandlers/node_url_handler.js',
+        },
+        {
+          find: /(.*)\/track_browser/,
+          replacement: '$1/track_node',
         },
       ],
     }),

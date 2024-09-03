@@ -1,16 +1,5 @@
 import { supportedMacros } from './macros';
 
-function track(URLTemplates, macros, options) {
-  const URLs = resolveURLTemplates(URLTemplates, macros, options);
-
-  URLs.forEach((URL) => {
-    if (typeof window !== 'undefined' && window !== null) {
-      const i = new Image();
-      i.src = URL;
-    }
-  });
-}
-
 /**
  * Replace the provided URLTemplates with the given values
  *
@@ -231,7 +220,6 @@ function isValidTimeValue(time) {
 }
 
 export const util = {
-  track,
   resolveURLTemplates,
   extractURLsFromTemplates,
   containsTemplateObject,

@@ -303,15 +303,6 @@
   var supportedMacros = ['ADCATEGORIES', 'ADCOUNT', 'ADPLAYHEAD', 'ADSERVINGID', 'ADTYPE', 'APIFRAMEWORKS', 'APPBUNDLE', 'ASSETURI', 'BLOCKEDADCATEGORIES', 'BREAKMAXADLENGTH', 'BREAKMAXADS', 'BREAKMAXDURATION', 'BREAKMINADLENGTH', 'BREAKMINDURATION', 'BREAKPOSITION', 'CLICKPOS', 'CLICKTYPE', 'CLIENTUA', 'CONTENTID', 'CONTENTPLAYHEAD', // @deprecated VAST 4.1
   'CONTENTURI', 'DEVICEIP', 'DEVICEUA', 'DOMAIN', 'EXTENSIONS', 'GDPRCONSENT', 'IFA', 'IFATYPE', 'INVENTORYSTATE', 'LATLONG', 'LIMITADTRACKING', 'MEDIAMIME', 'MEDIAPLAYHEAD', 'OMIDPARTNER', 'PAGEURL', 'PLACEMENTTYPE', 'PLAYERCAPABILITIES', 'PLAYERSIZE', 'PLAYERSTATE', 'PODSEQUENCE', 'REGULATIONS', 'SERVERSIDE', 'SERVERUA', 'TRANSACTIONID', 'UNIVERSALADID', 'VASTVERSIONS', 'VERIFICATIONVENDORS'];
 
-  function track(URLTemplates, macros, options) {
-    var URLs = resolveURLTemplates(URLTemplates, macros, options);
-    URLs.forEach(function (URL) {
-      if (typeof window !== 'undefined' && window !== null) {
-        var i = new Image();
-        i.src = URL;
-      }
-    });
-  }
   /**
    * Replace the provided URLTemplates with the given values
    *
@@ -319,7 +310,6 @@
    * @param {Object} [macros={}] - An optional Object of parameters to be used in the tracking calls.
    * @param {Object} [options={}] - An optional Object of options to be used in the tracking calls.
    */
-
 
   function resolveURLTemplates(URLTemplates) {
     var macros = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -539,7 +529,6 @@
   }
 
   var util = {
-    track: track,
     resolveURLTemplates: resolveURLTemplates,
     extractURLsFromTemplates: extractURLsFromTemplates,
     containsTemplateObject: containsTemplateObject,
@@ -2511,6 +2500,14 @@
     get: get
   };
 
+  function track(URLTemplates, macros, options) {
+    var URLs = util.resolveURLTemplates(URLTemplates, macros, options);
+    URLs.forEach(function (URL) {
+      var i = new Image();
+      i.src = URL;
+    });
+  }
+
   function createVASTResponse(_ref) {
     var ads = _ref.ads,
         errorURLTemplates = _ref.errorURLTemplates,
@@ -2641,7 +2638,7 @@
         }
 
         this.emit('VAST-error', Object.assign.apply(Object, [{}, DEFAULT_EVENT_DATA, errorCode].concat(data)));
-        util.track(urlTemplates, errorCode);
+        track(urlTemplates, errorCode);
       }
       /**
        * Returns an array of errorURLTemplates for the VAST being parsed.
@@ -4348,7 +4345,7 @@
           }
         }
 
-        util.track(URLTemplates, givenMacros, options);
+        track(URLTemplates, givenMacros, options);
       }
       /**
        * Formats time in seconds to VAST timecode (e.g. 00:00:10.000)

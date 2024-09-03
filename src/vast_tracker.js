@@ -3,6 +3,7 @@ import { isCreativeLinear } from './creative/creative_linear';
 import { EventEmitter } from './util/event_emitter';
 import { isNonLinearAd } from './non_linear_ad';
 import { util } from './util/util';
+import track from './util/track_browser';
 
 /**
  * The default skip delay used in case a custom one is not provided
@@ -149,7 +150,7 @@ export class VASTTracker extends EventEmitter {
    */
   setDuration(duration) {
     // check if duration is a valid time input
-    if(!util.isValidTimeValue(duration)) {
+    if (!util.isValidTimeValue(duration)) {
       return;
     }
     this.assetDuration = duration;
@@ -602,7 +603,11 @@ export class VASTTracker extends EventEmitter {
    * @emits VASTTracker#clickthrough
    */
   click(fallbackClickThroughURL = null, macros = {}) {
-    if ((fallbackClickThroughURL !== null && typeof fallbackClickThroughURL !== 'string') || typeof macros !== 'object') {
+    if (
+      (fallbackClickThroughURL !== null &&
+        typeof fallbackClickThroughURL !== 'string') ||
+      typeof macros !== 'object'
+    ) {
       return;
     }
     if (
@@ -726,7 +731,7 @@ export class VASTTracker extends EventEmitter {
       }
     }
 
-    util.track(URLTemplates, givenMacros, options);
+    track(URLTemplates, givenMacros, options);
   }
 
   /**
@@ -747,7 +752,10 @@ export class VASTTracker extends EventEmitter {
     return `${util.addLeadingZeros(hours, 2)}:${util.addLeadingZeros(
       minutes,
       2
-    )}:${util.addLeadingZeros(seconds, 2)}.${util.addLeadingZeros(milliseconds, 3)}`;
+    )}:${util.addLeadingZeros(seconds, 2)}.${util.addLeadingZeros(
+      milliseconds,
+      3
+    )}`;
   }
 
   /**
