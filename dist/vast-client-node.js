@@ -2407,15 +2407,15 @@ var uri = require('url');
 
 var fs = require('fs');
 
-var http = require('http');
+var http$1 = require('http');
 
-var https = require('https');
+var https$1 = require('https');
 
 var DOMParser = require('@xmldom/xmldom').DOMParser;
 
 function get$1(url, options, cb) {
   url = uri.parse(url);
-  var httpModule = url.protocol === 'https:' ? https : http;
+  var httpModule = url.protocol === 'https:' ? https$1 : http$1;
 
   if (url.protocol === 'file:') {
     fs.readFile(uri.fileURLToPath(url.href), 'utf8', function (err, data) {
@@ -2491,12 +2491,18 @@ var urlHandler = {
   get: get
 };
 
+var http = require('http');
+
+var https = require('https');
+
+var url = require('url');
 function track(URLTemplates, macros, options) {
   var URLs = util.resolveURLTemplates(URLTemplates, macros, options);
   URLs.forEach(function (URL) {
-    var https = require('https');
-
-    https.get(URL);
+    var parsedURL = url.parse(URL);
+    var protocol = parsedURL.protocol;
+    var httpModule = protocol === 'https:' ? https : http;
+    httpModule.get(URL);
   });
 }
 
