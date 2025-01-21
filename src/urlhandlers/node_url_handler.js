@@ -1,14 +1,12 @@
 import { DEFAULT_TIMEOUT } from './consts';
 
-const uri = require('url');
 const fs = require('fs');
-const http = require('http');
-const https = require('https');
+const uri = require('url');
 const DOMParser = require('@xmldom/xmldom').DOMParser;
 
 function get(url, options, cb) {
   url = uri.parse(url);
-  const httpModule = url.protocol === 'https:' ? https : http;
+
   if (url.protocol === 'file:') {
     fs.readFile(uri.fileURLToPath(url.href), 'utf8', function (err, data) {
       if (err) {
@@ -18,52 +16,48 @@ function get(url, options, cb) {
       cb(null, xml, { byteLength: Buffer.from(data).byteLength });
     });
   } else {
-    let timeoutId;
-    let data = '';
     const timeout = options.timeout || DEFAULT_TIMEOUT;
+    const xhr = new XMLHttpRequest();
 
-    const req = httpModule.get(url.href, function (res) {
-      res.on('data', function (chunk) {
-        data += chunk;
-        clearTimeout(timeoutId);
-        timeoutId = startTimeout();
-      });
-      res.on('end', function () {
-        clearTimeout(timeoutId);
-        const xml = new DOMParser().parseFromString(data);
+    xhr.open('GET', url.href, true);
+    xhr.timeout = timeout;
+
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const xml = new DOMParser().parseFromString(xhr.responseText);
         cb(null, xml, {
-          byteLength: Buffer.from(data).byteLength,
-          statusCode: res.statusCode,
+          byteLength: xhr.responseText.length,
+          statusCode: xhr.status,
         });
-      });
-    });
-
-    req.on('error', function (err) {
-      clearTimeout(timeoutId);
-
-      if (req.aborted) {
-        cb(
-          new Error(`NodeURLHandler: Request timed out after ${timeout} ms.`),
-          null,
-          {
-            statusCode: 408, // Request timeout
-          }
-        );
       } else {
-        cb(err);
+        cb(new Error(`Request failed with status ${xhr.status}`), null, {
+          statusCode: xhr.status,
+        });
       }
-    });
-
-    const startTimeout = () => {
-      return setTimeout(() => req.abort(), timeout);
     };
-    timeoutId = startTimeout();
+
+    xhr.onerror = function () {
+      cb(new Error('Request error'), null, {
+        statusCode: xhr.status || 500,
+      });
+    };
+
+    xhr.ontimeout = function () {
+      cb(
+        new Error(`NodeURLHandler: Request timed out after ${timeout} ms.`),
+        null,
+        {
+          statusCode: 408, // Request timeout
+        }
+      );
+    };
+
+    xhr.send();
   }
 }
 
 export const nodeURLHandler = {
   get,
 };
-
 
 export default nodeURLHandler;
